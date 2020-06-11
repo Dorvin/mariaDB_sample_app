@@ -40,21 +40,21 @@ class Data(object):
         self.cursor.close()
 
     def is_hall_exist(self, id):
-        sql = f'select * from hall where id = {id};'
+        sql = 'select * from hall where id = {};'.format(id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.db.commit()
         return (len(result) != 0)
 
     def is_concert_exist(self, id):
-        sql = f'select * from concert where id = {id};'
+        sql = 'select * from concert where id = {};'.format(id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.db.commit()
         return (len(result) != 0)
 
     def is_audience_exist(self, id):
-        sql = f'select * from audience where id = {id};'
+        sql = 'select * from audience where id = {};'.format(id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.db.commit()
@@ -63,7 +63,7 @@ class Data(object):
     # if concert_id is not assigned, ()
     # else, (assign_id, hall_id)
     def get_assign_info(self, concert_id):
-        sql = f'select id, hall_id from assign where concert_id = {concert_id};'
+        sql = 'select id, hall_id from assign where concert_id = {};'.format(concert_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.db.commit()
@@ -72,7 +72,7 @@ class Data(object):
         return (result[0]['id'], result[0]['hall_id'])
 
     def get_capacity(self, hall_id):
-        sql = f'select capacity from hall where id = {hall_id};'
+        sql = 'select capacity from hall where id = {};'.format(hall_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.db.commit()
@@ -82,7 +82,7 @@ class Data(object):
         return result[0]['capacity']
 
     def get_age(self, audience_id):
-        sql = f'select age from audience where id = {audience_id};'
+        sql = 'select age from audience where id = {};'.format(audience_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.db.commit()
@@ -92,7 +92,7 @@ class Data(object):
         return result[0]['age']
 
     def get_price(self, concert_id):
-        sql = f'select price from concert where id = {concert_id};'
+        sql = 'select price from concert where id = {};'.format(concert_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.db.commit()
@@ -103,13 +103,13 @@ class Data(object):
 
     # e.g. [1, 3, 4, 10, 15] <- seat 1,3,4,10,15 are already booked by someone
     def get_booked_seat_number(self, concert_id):
-        sql = f'''
+        sql = '''
             select book.seat_number
             from assign, book
-            where assign.concert_id = {concert_id} and
+            where assign.concert_id = {} and
             assign.id = book.assign_id
             order by book.seat_number
-        '''
+        '''.format(concert_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.db.commit()
@@ -196,61 +196,61 @@ class Data(object):
 
     # 4
     def insert_hall(self, name, location, capacity):
-        sql = f'insert into hall values (default, "{name}", "{location}", {capacity});'
+        sql = 'insert into hall values (default, "{}", "{}", {});'.format(name, location, capacity)
         self.cursor.execute(sql)
         self.db.commit()
 
     # 5
     def delete_hall(self, id):
-        sql = f'delete from hall where id = {id};'
+        sql = 'delete from hall where id = {};'.format(id)
         self.cursor.execute(sql)
         self.db.commit()
     
     # 6
     def insert_concert(self, name, type, price):
-        sql = f'insert into concert values (default, "{name}", "{type}", {price});'
+        sql = 'insert into concert values (default, "{}", "{}", {});'.format(name, type, price)
         self.cursor.execute(sql)
         self.db.commit()
     
     # 7
     def delete_concert(self, id):
-        sql = f'delete from concert where id = {id};'
+        sql = 'delete from concert where id = {};'.format(id)
         self.cursor.execute(sql)
         self.db.commit()
 
     # 8
     def insert_audience(self, name, gender, age):
-        sql = f'insert into audience values (default, "{name}", "{gender}", {age});'
+        sql = 'insert into audience values (default, "{}", "{}", {});'.format(name, gender, age)
         self.cursor.execute(sql)
         self.db.commit()
 
     # 9
     def delete_audience(self, id):
-        sql = f'delete from audience where id = {id};'
+        sql = 'delete from audience where id = {};'.format(id)
         self.cursor.execute(sql)
         self.db.commit()
 
     # 10
     def assign(self, hall_id, concert_id):
-        sql = f'insert into assign values (default, {hall_id}, {concert_id});'
+        sql = 'insert into assign values (default, {}, {});'.format(hall_id, concert_id)
         self.cursor.execute(sql)
         self.db.commit()
     
     # 11
     def book(self, assign_id, audience_id, seat_number):
-        sql = f'insert into book values(default, {assign_id}, {audience_id}, {seat_number});'
+        sql = 'insert into book values(default, {}, {}, {});'.format(assign_id, audience_id, seat_number)
         self.cursor.execute(sql)
         self.db.commit()
 
     # 12
     def show_assigned_concert(self, hall_id):
-        sql = f'''
+        sql = '''
             select concert.id, concert.name, concert.type, concert.price, count(book.id)
             from concert join assign on (concert.id = assign.concert_id) left outer join book on(assign.id = book.assign_id)
-            where assign.hall_id = {hall_id}
+            where assign.hall_id = {}
             group by concert.id
             order by concert.id;
-        '''
+        '''.format(hall_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         line_print()
@@ -272,14 +272,14 @@ class Data(object):
 
     # 13
     def show_booked_audience(self, concert_id):
-        sql = f'''
+        sql = '''
             select distinct audience.id, audience.name, audience.gender, audience.age
             from assign, book, audience
-            where assign.concert_id = {concert_id} and
+            where assign.concert_id = {} and
             assign.id = book.assign_id and
             book.audience_id = audience.id
             order by audience.id
-        '''
+        '''.format(concert_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         line_print()
@@ -302,13 +302,13 @@ class Data(object):
         assign_info = self.get_assign_info(concert_id)
         hall_id = assign_info[1]
         capacity = self.get_capacity(hall_id)
-        sql = f'''
+        sql = '''
             select book.seat_number, book.audience_id
             from assign, book
-            where assign.concert_id = {concert_id} and
+            where assign.concert_id = {} and
             assign.id = book.assign_id
             order by book.seat_number
-        '''
+        '''.format(concert_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         line_print()
@@ -438,7 +438,7 @@ while(True):
     elif op == 5:
         id = int(input('Building ID: '))
         if not db.is_hall_exist(id):
-            print(f'Building {id} doesn’t exist\n')
+            print('Building {} doesn’t exist\n'.format(id))
             continue
         db.delete_hall(id)
         print('A building is successfully removed\n')
@@ -454,7 +454,7 @@ while(True):
     elif op == 7:
         id = int(input('Performance ID: '))
         if not db.is_concert_exist(id):
-            print(f'Performance {id} doesn’t exist\n')
+            print('Performance {} doesn’t exist\n'.format(id))
             continue
         db.delete_concert(id)
         print('A performance is successfully removed\n')
@@ -473,7 +473,7 @@ while(True):
     elif op == 9:
         id = int(input('Audience ID: '))
         if not db.is_audience_exist(id):
-            print(f'Audience {id} doesn’t exist\n')
+            print('Audience {} doesn’t exist\n'.format(id))
             continue
         db.delete_audience(id)
         print('An audience is successfully removed\n')
@@ -482,7 +482,7 @@ while(True):
         concert_id = int(input('Performance ID: '))
         assign_info = db.get_assign_info(concert_id)
         if len(assign_info) != 0:
-            print(f'Performance {concert_id} is already assigned\n')
+            print('Performance {} is already assigned\n'.format(concert_id))
             continue
         db.assign(hall_id, concert_id)
         print('Successfully assign a performance\n')
@@ -490,7 +490,7 @@ while(True):
         concert_id = int(input('Performance ID: '))
         assign_info = db.get_assign_info(concert_id)
         if len(assign_info) == 0:
-            print(f"Performance {concert_id} isn't assigned\n")
+            print("Performance {} isn't assigned\n".format(concert_id))
             continue
         price = db.get_price(concert_id)
         assign_id = assign_info[0]
@@ -532,27 +532,27 @@ while(True):
         total_price = len(seat_numbers) * price
         total_price = round(total_price)
         print('Successfully book a performance')
-        print(f'Total ticket price is {total_price}\n')
+        print('Total ticket price is {}\n'.format(total_price))
     elif op == 12:
         hall_id = int(input('Building ID: '))
         if not db.is_hall_exist(hall_id):
-            print(f'Building {hall_id} doesn’t exist\n')
+            print('Building {} doesn’t exist\n'.format(hall_id))
             continue
         db.show_assigned_concert(hall_id)
     elif op == 13:
         concert_id = int(input('Performance ID: '))
         if not db.is_concert_exist(concert_id):
-            print(f'Performance {concert_id} doesn’t exist\n')
+            print('Performance {} doesn’t exist\n'.format(concert_id))
             continue
         db.show_booked_audience(concert_id)
     elif op == 14:
         concert_id = int(input('Performance ID: '))
         if not db.is_concert_exist(concert_id):
-            print(f'Performance {concert_id} doesn’t exist\n')
+            print('Performance {} doesn’t exist\n'.format(concert_id))
             continue
         assign_info = db.get_assign_info(concert_id)
         if len(assign_info) == 0:
-            print(f"Performance {concert_id} isn't assigned\n")
+            print("Performance {} isn't assigned\n".format(concert_id))
             continue
         db.show_seat_state(concert_id)
     elif op == 15:
